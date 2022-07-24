@@ -35,7 +35,7 @@ CORS(app)
 @app.route('/drinks')
 @requires_auth("get:drinks")
 def get_drinks(payload):
-    # print("===>>", payload)
+    print("===>>", payload)
     return "All drinks retrieved"
 
 
@@ -154,9 +154,20 @@ def server_error(error):
 
 
 @app.errorhandler(AuthError)
-def AuthError(error):
+def handle_auth_error(error):
+    response = error.get_response()
+    response.data = json.dumps({
+        "code": error.status_code,
+        "message": error.code,
+        "description": error.description,
+    })
+    response.content_type = "application/json"
+    return response
 
-    response = jsonify(error)
+
+@app.errorhandler(AuthError)
+def handle_auth_error(error):
+    response = jsonify(error.to_dict())
     response.status_code = error.status_code
 
     return response
