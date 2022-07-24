@@ -72,24 +72,26 @@ def create_drink(payload):
     return jsonify({'success': True, 'drinks': [drink.long()]})
 
 
-'''
-@TODO implement endpoint
-    PATCH /drinks/<id>
-        where <id> is the existing model id
-        it should respond with a 404 error if <id> is not found
-        it should update the corresponding row for <id>
-        it should require the 'patch:drinks' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
-        or appropriate status code indicating reason for failure
-'''
-
-
 @ app.route("/drinks/<int:drink_id>", methods=["PATCH"])
 @ requires_auth("patch:drinks")
 def update_drink(payload, drink_id):
-    # print("===>>", payload)
-    return "Drinks successfully updated."
+    body = request.get_json()
+    drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
+
+    if not drink:
+        abort(404)
+
+    try:
+        title = body.get('title', None)
+
+        if title:
+            drink.title = title
+
+        drink.update()
+    except:
+        abort(400)
+
+    return jsonify({'success': True, 'drinks': [drink.long()]}), 200
 
 
 '''
