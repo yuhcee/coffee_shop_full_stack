@@ -78,7 +78,7 @@ def update_drink(payload, drink_id):
     body = request.get_json()
     drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
 
-    if not drink:
+    if drink is None:
         abort(404)
 
     try:
@@ -94,23 +94,20 @@ def update_drink(payload, drink_id):
     return jsonify({'success': True, 'drinks': [drink.long()]}), 200
 
 
-'''
-@TODO implement endpoint
-    DELETE /drinks/<id>
-        where <id> is the existing model id
-        it should respond with a 404 error if <id> is not found
-        it should delete the corresponding row for <id>
-        it should require the 'delete:drinks' permission
-    returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
-        or appropriate status code indicating reason for failure
-'''
-
-
 @ app.route("/drinks/<int:drink_id>", methods=["DELETE"])
 @ requires_auth("post:drinks")
 def delete_drink(payload, drink_id):
-    # print("===>>", payload)
-    return "Drinks successfully deleted."
+    drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
+
+    if drink is None:
+        abort(404)
+
+    try:
+        drink.delete()
+    except:
+        abort(400)
+
+    return jsonify({'success': True, 'delete': drink_id}), 200
 
 
 # Error Handling
