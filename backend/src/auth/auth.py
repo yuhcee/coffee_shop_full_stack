@@ -10,7 +10,7 @@ AUTH0_DOMAIN = os.environ["AUTH0_DOMAIN"]
 ALGORITHMS = os.environ["ALGORITHMS"]
 API_AUDIENCE = os.environ["API_AUDIENCE"]
 
-# https://dev-w5zvh1wa.us.auth0.com/authorize?audience=drink&response_type=token&client_id=auth0|62dc91e24ba44d87fd521b44&redirect_uri=https://127.0.0.1:8080/login-results
+
 # AuthError Exception
 '''
 AuthError Exception
