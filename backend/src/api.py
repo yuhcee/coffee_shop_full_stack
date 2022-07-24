@@ -32,7 +32,7 @@ CORS(app)
 '''
 
 
-@app.route('/drinks')
+@app.route('/drinks', methods=["GET"])
 @requires_auth("get:drinks")
 def get_drinks(payload):
     print("===>>", payload)
@@ -49,7 +49,7 @@ def get_drinks(payload):
 '''
 
 
-@app.route('/drinks-detail')
+@app.route('/drinks-detail', methods=["GET"])
 @requires_auth("get:drinks-detail")
 def get_drinks_detail(payload):
     # print("===>>", payload)
@@ -67,7 +67,7 @@ def get_drinks_detail(payload):
 '''
 
 
-@app.route('/drinks')
+@app.route('/drinks', methods=["POST"])
 @requires_auth("post:drinks")
 def create_drink(payload):
     # print("===>>", payload)
@@ -87,9 +87,9 @@ def create_drink(payload):
 '''
 
 
-@app.route('/drinks/<int:id>', methods=["PATCH"])
+@app.route("/drinks/<int:drink_id>", methods=["PATCH"])
 @requires_auth("patch:drinks")
-def update_drink_by_id(payload):
+def update_drink(payload, drink_id):
     # print("===>>", payload)
     return "Drinks successfully updated."
 
@@ -106,9 +106,9 @@ def update_drink_by_id(payload):
 '''
 
 
-@app.route('/drinks/<int:id>', methods=["DELETE"])
+@app.route("/drinks/<int:drink_id>", methods=["DELETE"])
 @requires_auth("post:drinks")
-def delete_drink(payload):
+def delete_drink(payload, drink_id):
     # print("===>>", payload)
     return "Drinks successfully deleted."
 
@@ -151,18 +151,6 @@ def unauthorized(error):
 @app.errorhandler(500)
 def server_error(error):
     return jsonify({"success": False, "error": 500, "message": "internal server error"}), 500
-
-
-@app.errorhandler(AuthError)
-def handle_auth_error(error):
-    response = error.get_response()
-    response.data = json.dumps({
-        "code": error.status_code,
-        "message": error.code,
-        "description": error.description,
-    })
-    response.content_type = "application/json"
-    return response
 
 
 @app.errorhandler(AuthError)
