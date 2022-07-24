@@ -19,7 +19,7 @@ CORS(app)
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 !! Running this funciton will add one
 '''
-# db_drop_and_create_all()
+db_drop_and_create_all()
 
 # ROUTES
 '''
@@ -35,8 +35,12 @@ CORS(app)
 @app.route('/drinks', methods=["GET"])
 @requires_auth("get:drinks")
 def get_drinks(payload):
-    print("===>>", payload)
-    return "All drinks retrieved"
+    try:
+        drinks = Drink.query.order_by(Drink.id).all()
+    except:
+        abort(404)
+
+    return jsonify({"success": True, "drinks": [drink.short() for drink in drinks]}), 200
 
 
 '''
@@ -49,8 +53,8 @@ def get_drinks(payload):
 '''
 
 
-@app.route('/drinks-detail', methods=["GET"])
-@requires_auth("get:drinks-detail")
+@ app.route('/drinks-detail', methods=["GET"])
+@ requires_auth("get:drinks-detail")
 def get_drinks_detail(payload):
     # print("===>>", payload)
     return "All drinks detail retrieved"
@@ -67,8 +71,8 @@ def get_drinks_detail(payload):
 '''
 
 
-@app.route('/drinks', methods=["POST"])
-@requires_auth("post:drinks")
+@ app.route('/drinks', methods=["POST"])
+@ requires_auth("post:drinks")
 def create_drink(payload):
     # print("===>>", payload)
     return "Drinks successfully added."
@@ -87,8 +91,8 @@ def create_drink(payload):
 '''
 
 
-@app.route("/drinks/<int:drink_id>", methods=["PATCH"])
-@requires_auth("patch:drinks")
+@ app.route("/drinks/<int:drink_id>", methods=["PATCH"])
+@ requires_auth("patch:drinks")
 def update_drink(payload, drink_id):
     # print("===>>", payload)
     return "Drinks successfully updated."
@@ -106,8 +110,8 @@ def update_drink(payload, drink_id):
 '''
 
 
-@app.route("/drinks/<int:drink_id>", methods=["DELETE"])
-@requires_auth("post:drinks")
+@ app.route("/drinks/<int:drink_id>", methods=["DELETE"])
+@ requires_auth("post:drinks")
 def delete_drink(payload, drink_id):
     # print("===>>", payload)
     return "Drinks successfully deleted."
@@ -115,7 +119,7 @@ def delete_drink(payload, drink_id):
 
 # Error Handling
 
-@app.errorhandler(422)
+@ app.errorhandler(422)
 def unprocessable(error):
     return jsonify({
         "success": False,
@@ -124,7 +128,7 @@ def unprocessable(error):
     }), 422
 
 
-@app.errorhandler(404)
+@ app.errorhandler(404)
 def not_found(error):
     return (
         jsonify({"success": False, "error": 404,
@@ -133,27 +137,27 @@ def not_found(error):
     )
 
 
-@app.errorhandler(400)
+@ app.errorhandler(400)
 def bad_request(error):
     return jsonify({"success": False, "error": 400, "message": "bad request"}), 400
 
 
-@app.errorhandler(405)
+@ app.errorhandler(405)
 def not_allowed(error):
     return jsonify({"success": False, "error": 405, "message": "method not allowed"}), 405
 
 
-@app.errorhandler(401)
+@ app.errorhandler(401)
 def unauthorized(error):
     return jsonify({"success": False, "error": 401, "message": "unauthorized"}), 401
 
 
-@app.errorhandler(500)
+@ app.errorhandler(500)
 def server_error(error):
     return jsonify({"success": False, "error": 500, "message": "internal server error"}), 500
 
 
-@app.errorhandler(AuthError)
+@ app.errorhandler(AuthError)
 def handle_auth_error(error):
     response = jsonify(error.to_dict())
     response.status_code = error.status_code
@@ -161,7 +165,7 @@ def handle_auth_error(error):
     return response
 
 
-@app.errorhandler(HTTPException)
+@ app.errorhandler(HTTPException)
 def handle_exception(e):
     response = e.get_response()
     response.data = json.dumps({
