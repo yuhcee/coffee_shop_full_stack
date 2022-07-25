@@ -106,6 +106,28 @@ def delete_drink(payload, drink_id):
 
 # Error Handling
 
+@ app.errorhandler(AuthError)
+def handle_auth_error(error):
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+
+    return response
+
+
+@app.errorhandler(AuthError)
+def auth_error(error):
+    return jsonify({
+        "success": False,
+        "error": error.status_code,
+        "message": error.error['description']
+    }), error.status_code
+
+
+@app.errorhandler(403)
+def permission_not_found(error):
+    return jsonify({"success": False, "error": 403, "message": "permission not found"}), 403
+
+
 @ app.errorhandler(422)
 def unprocessable(error):
     return jsonify({
@@ -142,14 +164,6 @@ def unauthorized(error):
 @ app.errorhandler(500)
 def server_error(error):
     return jsonify({"success": False, "error": 500, "message": "internal server error"}), 500
-
-
-@ app.errorhandler(AuthError)
-def handle_auth_error(error):
-    response = jsonify(error.to_dict())
-    response.status_code = error.status_code
-
-    return response
 
 
 @ app.errorhandler(HTTPException)
