@@ -65,11 +65,11 @@ def create_drink(payload):
     return jsonify({'success': True, 'drinks': [drink.long()]})
 
 
-@app.route("/drinks/<int:drink_id>", methods=["PATCH"])
+@app.route("/drinks/<int:id>", methods=["PATCH"])
 @requires_auth("patch:drinks")
-def update_drink(payload, drink_id):
+def update_drink(payload, id):
     body = request.get_json()
-    drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
+    drink = Drink.query.filter(Drink.id == id).one_or_none()
 
     if drink is None:
         abort(404)
@@ -87,10 +87,10 @@ def update_drink(payload, drink_id):
     return jsonify({'success': True, 'drinks': [drink.long()]}), 200
 
 
-@app.route("/drinks/<int:drink_id>", methods=["DELETE"])
+@app.route("/drinks/<int:id>", methods=["DELETE"])
 @requires_auth("post:drinks")
-def delete_drink(payload, drink_id):
-    drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
+def delete_drink(payload, id):
+    drink = Drink.query.filter(Drink.id == id).one_or_none()
 
     if drink is None:
         abort(404)
@@ -100,7 +100,7 @@ def delete_drink(payload, drink_id):
     except:
         abort(400)
 
-    return jsonify({'success': True, 'delete': drink_id}), 200
+    return jsonify({'success': True, 'delete': id}), 200
 
 
 # Error Handling
